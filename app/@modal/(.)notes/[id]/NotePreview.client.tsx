@@ -6,7 +6,7 @@ import Modal from '@/components/Modal/Modal';
 //import NotePreview from '@/components/NotePreview/NotePreview';
 import css from '@/app/@modal/(.)notes/[id]/NotePreview.client.module.css';
 import Loader from '@/components/Loader/Loader';
-import { getNoteById } from '@/lib/api';
+import { getNoteById } from '@/app/api/clientApi';
 import type { Note } from '@/types/note';
 
 export default function NoteDetailsClient() {
@@ -22,7 +22,7 @@ export default function NoteDetailsClient() {
     error,
   } = useQuery<Note>({
     queryKey: ['note', id],
-    queryFn: () => getNoteById(Number(id)),
+    queryFn: () => getNoteById(id),
     refetchOnMount: false,
   });
 

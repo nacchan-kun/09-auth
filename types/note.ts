@@ -1,16 +1,14 @@
 export interface Note {
-  id: number;
   title: string;
   content: string;
-  tag: Tag;
+  tag: 'Todo' | 'Work' | 'Personal' | 'Meeting' | 'Shopping';
+  id: string;
   createdAt: string;
   updatedAt: string;
 }
 
-export interface DraftNote {
+export interface NewNote {
   title: string;
   content: string;
-  tag: Tag;
+  tag: 'Todo' | 'Work' | 'Personal' | 'Meeting' | 'Shopping';
 }
-
-export type Tag = 'Work' | 'Todo' | 'Personal' | 'Meeting' | 'Shopping';

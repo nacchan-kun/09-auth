@@ -10,10 +10,9 @@ import { getNoteById } from '@/app/api/clientApi';
 import type { Note } from '@/types/note';
 
 export default function NoteDetailsClient() {
-  const { id: numId } = useParams<{ id: string }>();
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
-  const id = Number(numId);
   const handleClose = () => router.back();
 
   const {

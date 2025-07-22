@@ -43,7 +43,7 @@ export default async function Profile() {
             <div className={css.avatarWrapper}>
               {data.avatar ? (
                 <Image
-                  src={data.avatar}
+                  src={data.avatar as string}
                   alt="User Avatar"
                   width={120}
                   height={120}

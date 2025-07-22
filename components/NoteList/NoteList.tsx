@@ -30,7 +30,7 @@ export default function NoteList({ items }: Props) {
           <NoteItem
             key={el.id}
             item={el}
-            removeItem={removeItem}
+            removeItemAction={removeItem}
             isPending={isPending}
           />
         ))}

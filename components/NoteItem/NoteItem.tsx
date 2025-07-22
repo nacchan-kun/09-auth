@@ -7,10 +7,10 @@ import Link from 'next/link';
 type Props = {
   item: Note;
   isPending: boolean;
-  removeItem: (id: string) => void;
+  removeItemAction: (id: string) => void;
 };
 
-export default function NoteItem({ item, isPending, removeItem }: Props) {
+export default function NoteItem({ item, isPending, removeItemAction }: Props) {
   return (
     <li className={css.listItem}>
       <h2 className={css.title}>{item.title}</h2>
@@ -23,7 +23,7 @@ export default function NoteItem({ item, isPending, removeItem }: Props) {
         <button
           className={css.button}
           onClick={() => {
-            removeItem(item.id);
+            removeItemAction(item.id);
           }}
           disabled={isPending}
         >

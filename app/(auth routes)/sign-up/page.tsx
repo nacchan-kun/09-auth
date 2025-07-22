@@ -11,11 +11,14 @@ import css from './SignUpPage.module.css';
 export default function SignUp() {
   const router = useRouter();
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const setUser = useAuthStore(state => state.setUser);
 
   const handleSubmit = async (formData: FormData) => {
     try {
+      setError('');
+      setIsLoading(true);
       const formValues = Object.fromEntries(formData) as RegisterRequest;
       const user = await register(formValues);
       if (user) {
@@ -27,13 +30,16 @@ export default function SignUp() {
     } catch (error) {
       console.log('error', error);
       setError('Oops... Something went wrong, try later');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <>
-      <h1 className={css.formTitle}>Sign up</h1>
+    <main className={css.mainContent}>
       <form action={handleSubmit} className={css.form}>
+        <h1 className={css.formTitle}>Sign up</h1>
+        
         <div className={css.formGroup}>
           <label htmlFor="email">Email</label>
           <input
@@ -57,12 +63,13 @@ export default function SignUp() {
         </div>
 
         <div className={css.actions}>
-          <button type="submit" className={css.submitButton}>
-            Register
+          <button type="submit" className={css.submitButton} disabled={isLoading}>
+            {isLoading ? 'Registering...' : 'Register'}
           </button>
         </div>
+
+        {error && <p className={css.error}>{error}</p>}
       </form>
-      {error && <p>{error}</p>}
-    </>
+    </main>
   );
 }

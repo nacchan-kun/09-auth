@@ -41,13 +41,32 @@ export default async function Profile() {
             </div>
 
             <div className={css.avatarWrapper}>
-              <Image
-                src={data.avatar}
-                alt="User Avatar"
-                width={120}
-                height={120}
-                className={css.avatar}
-              />
+              {data.avatar ? (
+                <Image
+                  src={data.avatar}
+                  alt="User Avatar"
+                  width={120}
+                  height={120}
+                  className={css.avatar}
+                />
+              ) : (
+                <div 
+                  className={css.avatar}
+                  style={{
+                    width: 120,
+                    height: 120,
+                    backgroundColor: '#e9ecef',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '48px',
+                    color: '#6c757d',
+                    borderRadius: '50%'
+                  }}
+                >
+                  👤
+                </div>
+              )}
             </div>
 
             <div className={css.profileInfo}>

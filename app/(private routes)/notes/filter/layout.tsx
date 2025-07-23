@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './FilterLayout.module.css';
 
 type Props = {
   children: React.ReactNode;
@@ -7,13 +8,13 @@ type Props = {
 
 export default function FilterLayout({ children, sidebar }: Props) {
   return (
-    <div style={{ display: 'flex' }}>
-      <div style={{ flex: 1 }}>
+    <div className={styles.container}>
+      <main className={styles.content}>
         {children}
-      </div>
-      <div style={{ width: '300px' }}>
+      </main>
+      <aside className={styles.sidebar}>
         {sidebar}
-      </div>
+      </aside>
     </div>
   );
 }

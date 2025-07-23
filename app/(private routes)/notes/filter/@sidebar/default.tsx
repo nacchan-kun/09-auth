@@ -4,14 +4,22 @@ import Link from 'next/link';
 import type { Tag } from '@/types/note';
 
 const NotesSidebar = async () => {
-  const response = await fetchNotes({});
-
-  const rawTags: Tag[] = response?.notes?.map(note => note.tag) ?? [];
-  const uniqueTags = Array.from(new Set<Tag>(rawTags));
-  const tags: Tag[] = [...uniqueTags];
+  let tags: Tag[] = [];
+  
+  try {
+    const response = await fetchNotes({});
+    const rawTags: Tag[] = response?.notes?.map(note => note.tag) ?? [];
+    const uniqueTags = Array.from(new Set<Tag>(rawTags));
+    tags = [...uniqueTags];
+  } catch (error) {
+    console.error('Failed to fetch notes for sidebar:', error);
+    // Fallback to default tags
+    tags = ['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'];
+  }
 
   return (
-    <aside>
+    <aside className={styles.sidebarContainer}>
+      <h3 className={styles.sidebarTitle}>Filter by Tag</h3>
       <ul className={styles.menuList}>
         <li className={styles.menuItem}>
           <Link href="/notes/filter/all" className={styles.menuLink}>

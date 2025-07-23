@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { getServerMe } from '@/lib/api/serverApi';
 import css from './page.module.css';
 
@@ -26,7 +27,7 @@ export default async function ProfilePage() {
           </Link>
         </div>
         <div className={css.avatarWrapper}>
-          <img
+          <Image
             src="/next.svg"
             alt="User Avatar"
             width={120}

@@ -9,6 +9,30 @@ export interface FetchNotesHTTPResponse {
   totalPages: number;
 }
 
+export type FetchNotesParams = {
+  search?: string;
+  page?: number;
+  tag?: string;
+};
+
+export async function fetchNotes(params: FetchNotesParams = {}): Promise<FetchNotesHTTPResponse> {
+  const cookieStore = await cookies();
+  const { search = '', page = 1, tag } = params;
+  
+  const response = await api.get<FetchNotesHTTPResponse>('/notes', {
+    params: {
+      ...(search !== '' && { search }),
+      page,
+      perPage: 12,
+      ...(tag && { tag }),
+    },
+    headers: {
+      Cookie: cookieStore.toString(),
+    },
+  });
+  return response.data;
+}
+
 export async function checkServerSession() {
   const cookieStore = await cookies();
   const response = await api.get('/auth/session', {

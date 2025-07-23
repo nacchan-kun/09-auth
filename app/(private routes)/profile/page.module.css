@@ -2,6 +2,8 @@
   max-width: 800px;
   margin: 0 auto;
   padding: 2rem;
+  display: block !important; /* Override global main styles */
+  flex-direction: initial !important;
 }
 
 .profileCard {
@@ -50,10 +52,12 @@
 
 .profileInfo {
   text-align: center;
+  display: block;
 }
 
 .profileInfo p {
   font-size: 1.1rem;
   margin: 0.5rem 0;
   color: #333;
+  display: block;
 }

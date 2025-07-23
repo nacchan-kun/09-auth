@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import css from './SignInPage.module.css';
 import { LoginRequest } from '@/types/authorisationTypes';
-import { login } from '@/app/api/clientApi';
+import { login } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useState } from 'react';
 

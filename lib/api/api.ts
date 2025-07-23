@@ -1,12 +1,14 @@
 import axios from 'axios';
 
+const baseURL = process.env.NEXT_PUBLIC_API_URL + '/api';
+
 export const api = axios.create({
-  baseURL: 'https://next-docs-api.onrender.com',
+  baseURL: 'https://notehub-api.goit.study',
   withCredentials: true,
 });
 
 export const nextServer = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL,
   withCredentials: true,
 });
 

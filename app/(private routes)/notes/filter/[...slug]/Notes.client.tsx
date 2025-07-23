@@ -2,9 +2,9 @@
 
 //import type { Note } from '@/types/note';
 import { useState } from 'react';
-import type { FetchNotesHTTPResponse } from '@/app/api/serverApi';
+import type { FetchNotesHTTPResponse } from '@/lib/api/serverApi';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
-import { fetchNotes } from '@/app/api/clientApi';
+import { fetchNotes } from '@/lib/api/clientApi';
 import SearchBox from '@/components/SearchBox/SearchBox';
 import Pagination from '@/components/Pagination/Pagination';
 import NoteList from '@/components/NoteList/NoteList';

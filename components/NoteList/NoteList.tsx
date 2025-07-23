@@ -3,7 +3,7 @@
 import { Note } from '@/types/note';
 import css from './NoteList.module.css';
 import NoteItem from '../NoteItem/NoteItem';
-import { deleteNote } from '@/app/api/clientApi';
+import { deleteNote } from '@/lib/api/clientApi';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 type Props = {

@@ -1,81 +1,105 @@
-import { getServerMe } from '@/lib/api/serverApi';
+'use client';
 
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { nextServer } from '@/lib/api/api';
+import { User } from '@/types/user';
 import css from './page.module.css';
-import Image from 'next/image';
-import Link from 'next/link';
-import { Metadata } from 'next';
 
-export const metadata: Metadata = {
-  title: 'Profile | NoteHub',
-  description:
-    'View your profile information and manage your account on NoteHub.',
-  openGraph: {
-    title: 'Profile | NoteHub',
-    description:
-      'View your profile information and manage your account on NoteHub.',
-    url: `https://09-auth-rust.vercel.app
-/profile`,
-    images: [
-      {
-        url: 'https://ac.goit.global/fullstack/react/notehub-og-meta.jpg',
-        width: 1200,
-        height: 630,
-        alt: 'NoteHub - Manage your profile and account settings.',
-      },
-    ],
-  },
-};
+export default function EditProfile() {
+  const [user, setUser] = useState<User | null>(null);
+  const [username, setUsername] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const router = useRouter();
 
-export default async function Profile() {
-  const data = await getServerMe();
+  useEffect(() => {
+    // Get user data from localStorage or API
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      const parsedUser = JSON.parse(userData);
+      setUser(parsedUser);
+      setUsername(parsedUser.username || '');
+    }
+  }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await nextServer.patch('/users/me', { username });
+      const updatedUser = response.data;
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      router.push('/profile');
+    } catch (error: unknown) {
+      setError(error instanceof Error ? error.message : 'Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!user) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <>
-      {data && (
-        <main className={css.mainContent}>
-          <div className={css.profileCard}>
-            <div className={css.header}>
-              <h1 className={css.formTitle}>Profile Page</h1>
-              <Link href="/profile/edit" className={css.editProfileButton}>
-                Edit Profile
-              </Link>
-            </div>
+    <main className={css.mainContent}>
+      <div className={css.profileCard}>
+        <div className={css.header}>
+          <h1 className={css.formTitle}>Edit Profile</h1>
+        </div>
 
-            <div className={css.avatarWrapper}>
-              {data.avatar ? (
-                <Image
-                  src={data.avatar as string}
-                  alt="User Avatar"
-                  width={120}
-                  height={120}
-                  className={css.avatar}
-                />
-              ) : (
-                <div 
-                  className={css.avatar}
-                  style={{
-                    width: 120,
-                    height: 120,
-                    backgroundColor: '#e9ecef',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '48px',
-                    color: '#6c757d',
-                    borderRadius: '50%'
-                  }}
-                >
-                  👤
-                </div>
-              )}
-            </div>
-
-            <div className={css.profileInfo}>
-              <p>Username: {data.username}</p>
-              <p>Email: {data.email}</p>
-            </div>
+        <form onSubmit={handleSubmit} className={css.form}>
+          <div className={css.inputGroup}>
+            <label htmlFor="username" className={css.label}>
+              Username
+            </label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className={css.input}
+              required
+            />
           </div>
-        </main>
-      )}
-    </>
+
+          <div className={css.inputGroup}>
+            <label htmlFor="email" className={css.label}>
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={user.email}
+              className={css.input}
+              disabled
+            />
+          </div>
+
+          {error && <div className={css.error}>{error}</div>}
+
+          <div className={css.buttonGroup}>
+            <button
+              type="button"
+              onClick={() => router.push('/profile')}
+              className={css.cancelButton}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={loading}
+              className={css.submitButton}
+            >
+              {loading ? 'Updating...' : 'Update Profile'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
   );
 }

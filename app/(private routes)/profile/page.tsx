@@ -1,8 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Metadata } from 'next';
 import { getServerMe } from '@/lib/api/serverApi';
 import css from './page.module.css';
+
+export const metadata: Metadata = {
+  title: 'Profile | NoteHub',
+  description: 'View your profile information and manage your account on NoteHub.',
+};
 
 export default async function ProfilePage() {
   let user;
@@ -13,7 +19,8 @@ export default async function ProfilePage() {
     console.error('Failed to fetch user data:', error);
     user = {
       username: 'Guest User',
-      email: 'guest@example.com'
+      email: 'guest@example.com',
+      avatar: '/next.svg'
     };
   }
 
@@ -28,7 +35,7 @@ export default async function ProfilePage() {
         </div>
         <div className={css.avatarWrapper}>
           <Image
-            src="/next.svg"
+            src={user?.avatar || '/next.svg'}
             alt="User Avatar"
             width={120}
             height={120}

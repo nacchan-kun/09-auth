@@ -2,6 +2,7 @@
 
 import { register } from '@/lib/api/clientApi';
 import { RegisterRequest } from '@/types/authorisationTypes';
+import { User } from '@/types/user';
 import { useAuthStore } from '@/lib/store/authStore';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -22,7 +23,12 @@ export default function SignUp() {
       const formValues = Object.fromEntries(formData) as RegisterRequest;
       const user = await register(formValues);
       if (user) {
-        setUser(user);
+        // Create a proper User object with avatar field
+        const userWithAvatar: User = {
+          ...user,
+          avatar: user.avatar || '', // Ensure avatar is always a string
+        };
+        setUser(userWithAvatar);
         router.replace('/profile');
       } else {
         setError('Invalid email or password');

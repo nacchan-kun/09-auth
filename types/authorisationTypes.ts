@@ -8,6 +8,7 @@ export type ResponseGetData = {
 export type RegisterResponse = {
   username: string;
   email: string;
+  avatar: string;
 };
 
 export type LoginResponse = {

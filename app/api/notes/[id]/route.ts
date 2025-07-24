@@ -1,54 +1,76 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { api } from '@/lib/api/api';
+import { isAxiosError } from 'axios';
+
+function logErrorResponse(error: unknown) {
+  if (isAxiosError(error)) {
+    console.error('Axios error:', error.response?.data || error.message);
+  } else if (error instanceof Error) {
+    console.error('Error:', error.message);
+  } else {
+    console.error('Unknown error:', error);
+  }
+}
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params
+    const { id } = await params;
+    const cookieStore = await cookies();
     
-    // Тут буде логіка отримання нотатки за ID
-    // Поки що повертаємо заглушку
-    return NextResponse.json({
-      id,
-      title: 'Sample Note',
-      content: 'This is a sample note content for testing purposes.',
-      tag: 'Personal',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
-    })
+    const response = await api.get(`/notes/${id}`, {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+    });
+    
+    return NextResponse.json(response.data);
   } catch (error) {
-    console.error('Error getting note:', error)
+    logErrorResponse(error);
+    if (isAxiosError(error)) {
+      return NextResponse.json(
+        { error: error.response?.data?.message || 'Failed to get note' },
+        { status: error.response?.status || 500 }
+      );
+    }
     return NextResponse.json(
-      { success: false, error: 'Failed to get note' },
+      { error: 'Failed to get note' },
       { status: 500 }
-    )
+    );
   }
 }
 
-export async function PUT(
+export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params
-    const body = await request.json()
+    const { id } = await params;
+    const cookieStore = await cookies();
+    const body = await request.json();
     
-    // Тут буде логіка оновлення нотатки
-    return NextResponse.json({
-      success: true,
-      data: {
-        id,
-        ...body,
-        updatedAt: new Date().toISOString()
-      }
-    })
+    const response = await api.patch(`/notes/${id}`, body, {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+    });
+    
+    return NextResponse.json(response.data);
   } catch (error) {
-    console.error('Error updating note:', error)
+    logErrorResponse(error);
+    if (isAxiosError(error)) {
+      return NextResponse.json(
+        { error: error.response?.data?.message || 'Failed to update note' },
+        { status: error.response?.status || 500 }
+      );
+    }
     return NextResponse.json(
-      { success: false, error: 'Failed to update note' },
+      { error: 'Failed to update note' },
       { status: 500 }
-    )
+    );
   }
 }
 
@@ -57,18 +79,29 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = await params
+    const { id } = await params;
+    const cookieStore = await cookies();
     
-    // Тут буде логіка видалення нотатки
-    return NextResponse.json({
-      success: true,
-      message: `Note ${id} deleted successfully`
-    })
+    const response = await api.delete(`/notes/${id}`, {
+      headers: {
+        Cookie: cookieStore.toString(),
+      },
+    });
+    
+    return NextResponse.json(response.data);
   } catch (error) {
-    console.error('Error deleting note:', error)
+    logErrorResponse(error);
+    if (isAxiosError(error)) {
+      return NextResponse.json(
+        { error: error.response?.data?.message || 'Failed to delete note' },
+        { status: error.response?.status || 500 }
+      );
+    }
     return NextResponse.json(
-      { success: false, error: 'Failed to delete note' },
+      { error: 'Failed to delete note' },
       { status: 500 }
-    )
+    );
   }
 }
+
+

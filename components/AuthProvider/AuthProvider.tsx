@@ -20,7 +20,7 @@ export default function AuthProvider({ children }: Props) {
         await checkSession();
         const user = await getMe();
         setUser(user);
-      } catch (error) {
+      } catch {
         // Don't log errors, just clear auth state
         clearIsAuthenticated();
       }

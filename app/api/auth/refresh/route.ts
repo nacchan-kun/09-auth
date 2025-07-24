@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { api } from '@/lib/api/api';
+import axios from 'axios';
 import { parse } from 'cookie';
 import { isAxiosError } from 'axios';
 import { logErrorResponse } from '../../_utils/utils';
@@ -12,10 +12,11 @@ export async function GET(request: NextRequest) {
     const next = request.nextUrl.searchParams.get('next') || '/';
 
     if (refreshToken) {
-      const apiRes = await api.get('auth/session', {
+      const apiRes = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/session`, {
         headers: {
           Cookie: cookieStore.toString(),
         },
+        withCredentials: true,
       });
       const setCookie = apiRes.headers['set-cookie'];
       if (setCookie) {

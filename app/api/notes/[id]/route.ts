@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { api } from '@/lib/api/api';
+import axios from 'axios';
 import { isAxiosError } from 'axios';
 
 function logErrorResponse(error: unknown) {
@@ -21,10 +21,11 @@ export async function GET(
     const { id } = await params;
     const cookieStore = await cookies();
     
-    const response = await api.get(`/notes/${id}`, {
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/notes/${id}`, {
       headers: {
         Cookie: cookieStore.toString(),
       },
+      withCredentials: true,
     });
     
     return NextResponse.json(response.data);
@@ -52,10 +53,11 @@ export async function PATCH(
     const cookieStore = await cookies();
     const body = await request.json();
     
-    const response = await api.patch(`/notes/${id}`, body, {
+    const response = await axios.patch(`${process.env.NEXT_PUBLIC_API_URL}/notes/${id}`, body, {
       headers: {
         Cookie: cookieStore.toString(),
       },
+      withCredentials: true,
     });
     
     return NextResponse.json(response.data);
@@ -82,10 +84,11 @@ export async function DELETE(
     const { id } = await params;
     const cookieStore = await cookies();
     
-    const response = await api.delete(`/notes/${id}`, {
+    const response = await axios.delete(`${process.env.NEXT_PUBLIC_API_URL}/notes/${id}`, {
       headers: {
         Cookie: cookieStore.toString(),
       },
+      withCredentials: true,
     });
     
     return NextResponse.json(response.data);

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { api } from '@/lib/api/api';
+import axios from 'axios';
 import { cookies } from 'next/headers';
 import { parse } from 'cookie';
 import { isAxiosError } from 'axios';
@@ -9,7 +9,10 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const apiRes = await api.post('auth/register', body);
+    // Call external API directly
+    const apiRes = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, body, {
+      withCredentials: true,
+    });
 
     const cookieStore = await cookies();
     const setCookie = apiRes.headers['set-cookie'];

@@ -14,46 +14,22 @@ export default function AuthProvider({ children }: Props) {
     state => state.clearIsAuthenticated
   );
 
-  // useEffect(() => {
-  //   async function fetchUser() {
-  //     // Перевіряємо сесію
-  //     const isAuthenticated = await checkSession();
-  //     // if (isAuthenticated.message === 'No active session found') {
-  //     //   console.log('Error 400: No active session found');
-  //     //   return;
-  //     // }
-  //     // if (isAuthenticated.message === 'Invalid or expired token') {
-  //     //   console.log('Error 401: Invalid or expired token');
-  //     //   return;
-  //     // }
-
-  //     // isAuthenticated.message === 'Session refreshed successfully';
-
-  //     if (isAuthenticated) {
-  //       // Якщо сесія валідна — отримуємо користувача
-  //       const user = await getMe();
-  //       if (user) setUser(user);
-  //     } else {
-  //       // Якщо сесія невалідна — чистимо стан
-  //       clearIsAuthenticated();
-  //     }
-  //   }
-  //   fetchUser();
-  // }, [setUser, clearIsAuthenticated]);
-
   useEffect(() => {
     async function fetchUser() {
       try {
         await checkSession();
         const user = await getMe();
         setUser(user);
-      } catch {
+      } catch (error) {
+        // Don't log errors, just clear auth state
         clearIsAuthenticated();
-        console.log('ERROR!!!!!!');
       }
     }
+    
+    // Only run auth check, don't block rendering
     fetchUser();
   }, [setUser, clearIsAuthenticated]);
 
-  return children;
+  // Always render children, don't block on auth loading
+  return <>{children}</>;
 }

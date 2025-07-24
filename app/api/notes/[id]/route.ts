@@ -10,15 +10,12 @@ export async function GET(
     // Тут буде логіка отримання нотатки за ID
     // Поки що повертаємо заглушку
     return NextResponse.json({
-      success: true,
-      data: {
-        id,
-        title: 'Sample Note',
-        content: 'Sample content',
-        tags: [],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      }
+      id,
+      title: 'Sample Note',
+      content: 'This is a sample note content for testing purposes.',
+      tag: 'Personal',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
     })
   } catch (error) {
     console.error('Error getting note:', error)

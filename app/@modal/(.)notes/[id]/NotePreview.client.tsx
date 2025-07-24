@@ -28,7 +28,15 @@ export default function NoteDetailsClient() {
   return (
     <Modal onClose={handleClose}>
       {isLoading && <Loader />}
-      {error && <p>Error loading note</p>}
+      {error && (
+        <div style={{ padding: '20px', textAlign: 'center' }}>
+          <h3>Error Loading Note</h3>
+          <p>Unable to load the note preview.</p>
+          <button onClick={handleClose} style={{ marginTop: '10px', padding: '8px 16px' }}>
+            Close
+          </button>
+        </div>
+      )}
       {note && (
         <div className={css.container}>
           <div className={css.item}>
@@ -42,14 +50,24 @@ export default function NoteDetailsClient() {
             <div className={css.tagdate}>
               {note.tag && <p className={css.tag}>{note.tag}</p>}
               <p className={css.date}>
-                {new Intl.DateTimeFormat('uk-UA', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit',
-                }).format(new Date(note.createdAt))}
+                {(() => {
+                  try {
+                    const date = new Date(note.createdAt);
+                    if (isNaN(date.getTime())) {
+                      return 'Invalid date';
+                    }
+                    return new Intl.DateTimeFormat('uk-UA', {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    }).format(date);
+                  } catch {
+                    return 'Date unavailable';
+                  }
+                })()}
               </p>
             </div>
           </div>

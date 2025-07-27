@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import { nextServer } from './api';
+import { api } from './api';
 import { Note } from '@/types/note';
 import { User } from '@/types/user';
 import { AxiosResponse } from 'axios';
@@ -27,12 +27,13 @@ export const getCookieHeader = async (): Promise<string> => {
     .join('; ');
 };
 
-export const getServerMe = async (): Promise<User> => {
-  const cookieHeader = await getCookieHeader();
-  const { data } = await nextServer.get<User>('/users/me', {
-    headers: { Cookie: cookieHeader },
+export const getServerMe = async (cookies: string) => {
+  const response = await api.get('/users/me', {
+    headers: {
+      Cookie: cookies,
+    },
   });
-  return data;
+  return response.data;
 };
 
 export const fetchNotes = async (

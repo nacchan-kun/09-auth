@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
+import { headers } from 'next/headers'; // Add this import
 import { getServerMe } from '@/lib/api/serverApi';
 import css from './page.module.css';
 
@@ -12,15 +13,16 @@ export const metadata: Metadata = {
 
 export default async function ProfilePage() {
   let user;
-  
+
   try {
-    user = await getServerMe();
+    const cookies = headers().get('cookie') || ''; // Get cookies from the request headers
+    user = await getServerMe(cookies);
   } catch (error) {
     console.error('Failed to fetch user data:', error);
     user = {
       username: 'Guest User',
       email: 'guest@example.com',
-      avatar: '/next.svg'
+      avatar: '/next.svg',
     };
   }
 
@@ -43,12 +45,8 @@ export default async function ProfilePage() {
           />
         </div>
         <div className={css.profileInfo}>
-          <p>
-            Username: {user?.username || 'your_username'}
-          </p>
-          <p>
-            Email: {user?.email || 'your_email@example.com'}
-          </p>
+          <p>Username: {user?.username || 'your_username'}</p>
+          <p>Email: {user?.email || 'your_email@example.com'}</p>
         </div>
       </div>
     </main>

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import axios from 'axios';
+import { api } from '../../api';
 import { parse } from 'cookie';
 import { isAxiosError } from 'axios';
 import { logErrorResponse } from '../../_utils/utils';
@@ -16,7 +16,7 @@ export async function GET() {
     }
 
     if (refreshToken) {
-      const apiRes = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/session`, {
+      const apiRes = await api.get('auth/session', {
         headers: {
           Cookie: cookieStore.toString(),
         },
@@ -35,18 +35,13 @@ export async function GET() {
             maxAge: Number(parsed['Max-Age']),
           };
 
-          if (parsed.accessToken)
-            cookieStore.set('accessToken', parsed.accessToken, options);
-          if (parsed.refreshToken)
-            cookieStore.set('refreshToken', parsed.refreshToken, options);
+          if (parsed.accessToken) cookieStore.set('accessToken', parsed.accessToken, options);
+          if (parsed.refreshToken) cookieStore.set('refreshToken', parsed.refreshToken, options);
         }
         return NextResponse.json({ success: true }, { status: apiRes.status });
       }
     }
-    return NextResponse.json(
-      { error: 'Invalid or expired refresh token' },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: 'Invalid or expired refresh token' }, { status: 401 });
   } catch (error) {
     if (isAxiosError(error)) {
       logErrorResponse(error.response?.data);
@@ -56,9 +51,6 @@ export async function GET() {
       );
     }
     logErrorResponse({ message: (error as Error).message });
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

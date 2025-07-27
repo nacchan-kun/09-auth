@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
+import { api } from '../api';
 import { cookies } from 'next/headers';
 import { isAxiosError } from 'axios';
 import { logErrorResponse } from '../_utils/utils';
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     const rawTag = request.nextUrl.searchParams.get('tag') ?? '';
     const tag = rawTag === 'All' ? '' : rawTag;
 
-    const res = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/notes`, {
+    const res = await api('/notes', {
       params: {
         ...(search !== '' && { search }),
         page,
@@ -22,7 +22,6 @@ export async function GET(request: NextRequest) {
       headers: {
         Cookie: cookieStore.toString(),
       },
-      withCredentials: true,
     });
 
     return NextResponse.json(res.data, { status: res.status });
@@ -35,10 +34,7 @@ export async function GET(request: NextRequest) {
       );
     }
     logErrorResponse({ message: (error as Error).message });
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
 
@@ -48,12 +44,11 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
 
-    const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/notes`, body, {
+    const res = await api.post('/notes', body, {
       headers: {
         Cookie: cookieStore.toString(),
         'Content-Type': 'application/json',
       },
-      withCredentials: true,
     });
 
     return NextResponse.json(res.data, { status: res.status });
@@ -66,9 +61,6 @@ export async function POST(request: NextRequest) {
       );
     }
     logErrorResponse({ message: (error as Error).message });
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

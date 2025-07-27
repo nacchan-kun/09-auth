@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import axios from 'axios';
+import { api } from '../../api';
 import { cookies } from 'next/headers';
 import { parse } from 'cookie';
 import { isAxiosError } from 'axios';
@@ -9,10 +9,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // Call external API directly
-    const apiRes = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/register`, body, {
-      withCredentials: true,
-    });
+    const apiRes = await api.post('auth/register', body);
 
     const cookieStore = await cookies();
     const setCookie = apiRes.headers['set-cookie'];
@@ -27,10 +24,8 @@ export async function POST(req: NextRequest) {
           path: parsed.Path,
           maxAge: Number(parsed['Max-Age']),
         };
-        if (parsed.accessToken)
-          cookieStore.set('accessToken', parsed.accessToken, options);
-        if (parsed.refreshToken)
-          cookieStore.set('refreshToken', parsed.refreshToken, options);
+        if (parsed.accessToken) cookieStore.set('accessToken', parsed.accessToken, options);
+        if (parsed.refreshToken) cookieStore.set('refreshToken', parsed.refreshToken, options);
       }
       return NextResponse.json(apiRes.data, { status: apiRes.status });
     }
@@ -45,9 +40,6 @@ export async function POST(req: NextRequest) {
       );
     }
     logErrorResponse({ message: (error as Error).message });
-    return NextResponse.json(
-      { error: 'Internal Server Error' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

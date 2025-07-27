@@ -1,8 +1,7 @@
 import { cookies } from 'next/headers';
-import { api } from './api';
-import { Note } from '@/types/note';
 import { User } from '@/types/user';
-import { AxiosResponse } from 'axios';
+import { Note } from '@/types/note';
+import { api } from './api';
 
 export interface FetchNotesHTTPResponse {
   notes: Note[];
@@ -19,50 +18,71 @@ export type ServerResponse = {
   success: boolean;
 };
 
-export const getCookieHeader = async (): Promise<string> => {
-  const cookieStore = await cookies();
-  return cookieStore
-    .getAll()
+export const getCookieHeader = async (): Promise<string> => { // Make it async
+  const cookieStore = await cookies(); // Add await
+  return cookieStore.getAll()
     .map(({ name, value }) => `${name}=${value}`)
     .join('; ');
 };
 
-export const getServerMe = async (cookies: string) => {
-  const response = await api.get('/users/me', {
-    headers: {
-      Cookie: cookies,
-    },
-  });
-  return response.data;
+export const getServerMe = async (): Promise<User | null> => {
+  try {
+    const cookieHeader = await getCookieHeader(); // Add await
+    const response = await api.get<User>('/users/me', {
+      headers: {
+        Cookie: cookieHeader,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error in getServerMe:', error);
+    return null;
+  }
 };
 
 export const fetchNotes = async (
   params: FetchNotesParams = {}
 ): Promise<FetchNotesHTTPResponse> => {
-  const cookieHeader = await getCookieHeader();
-  const response = await nextServer.get<FetchNotesHTTPResponse>('/notes', {
-    params: {
-      ...(params.search && { search: params.search }),
-      page: params.page,
-      perPage: 12,
-      ...(params.tag && { tag: params.tag }),
-    },
-    headers: { Cookie: cookieHeader },
-  });
-  return response.data;
+  try {
+    const cookieHeader = await getCookieHeader(); // Add await
+    const response = await api.get<FetchNotesHTTPResponse>('/notes', {
+      params: {
+        ...(params.search && { search: params.search }),
+        page: params.page || 1,
+        perPage: 12,
+        ...(params.tag && { tag: params.tag }),
+      },
+      headers: { Cookie: cookieHeader },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error in fetchNotes:', error);
+    return { notes: [], totalPages: 0 };
+  }
 };
 
-export const checkSession = async (): Promise<AxiosResponse<ServerResponse>> => {
-  const cookieHeader = await getCookieHeader();
-  return await nextServer.get<ServerResponse>('/auth/session', {
-    headers: { Cookie: cookieHeader },
-  });
+export const checkSession = async (): Promise<ServerResponse> => {
+  try {
+    const cookieHeader = await getCookieHeader(); // Add await
+    const response = await api.get<ServerResponse>('/auth/session', {
+      headers: { Cookie: cookieHeader },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error in checkSession:', error);
+    return { success: false };
+  }
 };
 
-export const getNoteById = async (id: string): Promise<Note> => {
-  const cookieHeader = await getCookieHeader();
-  const { data } = await nextServer.get<Note>(`/notes/${id}`, {
-    headers: { Cookie: cookieHeader },
-  });
-  return data;
+export const getNoteById = async (id: string): Promise<Note | null> => {
+  try {
+    const cookieHeader = await getCookieHeader(); // Add await
+    const response = await api.get<Note>(`/notes/${id}`, {
+      headers: { Cookie: cookieHeader },
+    });
+    return response.data;
+  } catch (error) {
+    console.error(`Error in getNoteById for ID ${id}:`, error);
+    return null;
+  }
 };

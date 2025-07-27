@@ -2,7 +2,6 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
-import { headers } from 'next/headers'; // Add this import
 import { getServerMe } from '@/lib/api/serverApi';
 import css from './page.module.css';
 
@@ -15,8 +14,7 @@ export default async function ProfilePage() {
   let user;
 
   try {
-    const cookies = headers().get('cookie') || ''; // Get cookies from the request headers
-    user = await getServerMe(cookies);
+    user = await getServerMe(); // Remove the cookies parameter
   } catch (error) {
     console.error('Failed to fetch user data:', error);
     user = {

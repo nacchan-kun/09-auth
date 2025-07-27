@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { nextServer } from '@/lib/api/api';
+import { api } from '@/lib/api/api'; // Replace nextServer with api
 import { User } from '@/types/user';
 import css from './page.module.css';
 
@@ -29,7 +29,7 @@ export default function EditProfile() {
     setError('');
 
     try {
-      const response = await nextServer.patch('/users/me', { username });
+      const response = await api.patch('/users/me', { username });
       const updatedUser = response.data;
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));

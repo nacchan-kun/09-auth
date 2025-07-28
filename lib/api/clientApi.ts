@@ -54,8 +54,8 @@ export const deleteNote = async (id: string) => {
 };
 
 // Add token handling to login/register
-export const login = async (email: string, password: string) => {
-  const response = await api.post('/auth/login', { email, password });
+export const login = async (formValues: { email: string; password: string }) => {
+  const response = await api.post('/auth/login', formValues);
 
   // If API returns a token, store it
   if (response.data.token) {

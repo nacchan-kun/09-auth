@@ -21,7 +21,7 @@ export default function SignUp() {
       setError('');
       setIsLoading(true);
       const formValues = Object.fromEntries(formData) as RegisterRequest;
-      const user = await register(formValues);
+      const user = await register(formValues.email, formValues.password);
       if (user) {
         // Create a proper User object with avatar field
         const userWithAvatar: User = {

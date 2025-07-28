@@ -35,6 +35,37 @@ export default function Login() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const formData = new FormData(e.currentTarget);
+      const formValues = Object.fromEntries(formData) as LoginRequest;
+      const res = await login(formValues.email, formValues.password);
+
+      if (res) {
+        // Записуємо користувача у глобальний стан
+        setUser(res);
+        router.push('/profile');
+      }
+    } catch (error: any) {
+      console.error('error', error);
+
+      // Handle specific error cases
+      if (error.response?.status === 401) {
+        setError('Invalid email or password. Please check your credentials and try again.');
+      } else if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else {
+        setError('Login failed. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <main className={css.mainContent}>
       <form action={handleLogin} className={css.form}>

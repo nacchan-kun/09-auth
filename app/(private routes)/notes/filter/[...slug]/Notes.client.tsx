@@ -60,7 +60,7 @@ export default function NotesClient({ tag }: NotesClientProps) {
       {error && !(error instanceof Error) && <p>Failed to load notes.</p>}
       {isFetching && !isLoading && <Loader />}
       {data?.notes?.length === 0 && !isLoading && <p>No notes found.</p>}
-      {data?.notes && data.notes.length > 0 && <NoteList items={data.notes} />}
+      {data?.notes && data.notes.length > 0 && <NoteList notes={data.notes} />}
     </div>
   );
 }

@@ -30,6 +30,15 @@ export const logout = async (): Promise<void> => {
   await api.post('/auth/logout');
 };
 
+export const getSession = async (): Promise<User | null> => {
+  try {
+    const response = await api.get('/auth/session');
+    return response.data;
+  } catch (error) {
+    return null;
+  }
+};
+
 export const getMe = async (): Promise<User> => {
   const response = await api.get('/users/me');
   return response.data;

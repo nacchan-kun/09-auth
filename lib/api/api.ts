@@ -4,5 +4,5 @@ const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://notehub-api.goit.stu
 
 export const api = axios.create({
   baseURL,
-  withCredentials: true, // Add this back - it's needed for cookies
+  withCredentials: true,
 });

@@ -4,11 +4,11 @@ import { useAuthStore } from '@/lib/store/authStore';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-export default function PublicLayout({
+export default function AuthLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   const [loading, setLoading] = useState(true);
   const clearIsAuthenticated = useAuthStore(
     state => state.clearIsAuthenticated

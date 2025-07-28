@@ -1,44 +1,50 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api/api'; // Replace nextServer with api
+import Image from 'next/image';
+import { useAuthStore } from '@/lib/store/authStore';
+import { updateProfile } from '@/lib/api/clientApi';
 import { User } from '@/types/user';
 import css from './page.module.css';
 
-export default function EditProfile() {
-  const [user, setUser] = useState<User | null>(null);
-  const [username, setUsername] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+export default function EditProfilePage() {
+  const { user, setUser } = useAuthStore();
   const router = useRouter();
+  const [username, setUsername] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    // Get user data from localStorage or API
-    const userData = localStorage.getItem('user');
-    if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
-      setUsername(parsedUser.username || '');
+    if (user) {
+      setUsername(user.username || '');
     }
-  }, []);
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
+    if (!user) return;
+
+    setIsLoading(true);
     setError('');
 
     try {
-      const response = await api.patch('/users/me', { username });
-      const updatedUser = response.data;
+      const updatedUser = await updateProfile({ username });
+
+      // Update the global authentication store
       setUser(updatedUser);
-      localStorage.setItem('user', JSON.stringify(updatedUser));
+
       router.push('/profile');
-    } catch (error: unknown) {
-      setError(error instanceof Error ? error.message : 'Failed to update profile');
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      setError('Failed to update profile. Please try again.');
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
+  };
+
+  const handleCancel = () => {
+    router.push('/profile');
   };
 
   if (!user) {
@@ -48,54 +54,63 @@ export default function EditProfile() {
   return (
     <main className={css.mainContent}>
       <div className={css.profileCard}>
-        <div className={css.header}>
-          <h1 className={css.formTitle}>Edit Profile</h1>
+        <h1 className={css.formTitle}>Edit Profile</h1>
+
+        {/* Display user avatar using Next.js Image component */}
+        <div className={css.avatarWrapper}>
+          <Image
+            src={user.avatar || '/next.svg'}
+            alt="User Avatar"
+            width={120}
+            height={120}
+            className={css.avatar}
+          />
         </div>
 
-        <form onSubmit={handleSubmit} className={css.form}>
-          <div className={css.inputGroup}>
-            <label htmlFor="username" className={css.label}>
-              Username
-            </label>
+        <form className={css.form} onSubmit={handleSubmit}>
+          <div className={css.formGroup}>
+            <label htmlFor="username">Username</label>
             <input
-              type="text"
               id="username"
+              type="text"
+              name="username"
+              className={css.input}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className={css.input}
               required
             />
           </div>
 
-          <div className={css.inputGroup}>
-            <label htmlFor="email" className={css.label}>
-              Email
-            </label>
+          <div className={css.formGroup}>
+            <label htmlFor="email">Email</label>
             <input
-              type="email"
               id="email"
-              value={user.email}
+              type="email"
+              name="email"
               className={css.input}
+              value={user.email}
+              readOnly
               disabled
             />
           </div>
 
-          {error && <div className={css.error}>{error}</div>}
+          {error && <p className={css.error}>{error}</p>}
 
-          <div className={css.buttonGroup}>
+          <div className={css.actions}>
             <button
               type="button"
-              onClick={() => router.push('/profile')}
               className={css.cancelButton}
+              onClick={handleCancel}
+              disabled={isLoading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              disabled={loading}
               className={css.submitButton}
+              disabled={isLoading}
             >
-              {loading ? 'Updating...' : 'Update Profile'}
+              {isLoading ? 'Updating...' : 'Update Profile'}
             </button>
           </div>
         </form>

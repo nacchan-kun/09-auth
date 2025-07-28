@@ -1,6 +1,7 @@
-export type User = {
-  username: string;
+export interface User {
+  id: string;
   email: string;
-  avatar: string;
-};
+  username?: string; // Make sure username is included
+  avatar?: string;
+}
 

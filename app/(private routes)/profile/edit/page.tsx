@@ -7,8 +7,6 @@ import Image from 'next/image';
 import { checkSession, getMe, updateMe } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
 
-import css from './page.module.css';
-
 export default function EditProfilePage() {
   const router = useRouter();
   const user = useAuthStore(state => state.user);
@@ -66,43 +64,33 @@ export default function EditProfilePage() {
   if (!user) return null;
 
   return (
-    <main className={css.mainContent}>
-      <div className={css.profileCard}>
-        <h1 className={css.formTitle}>Edit Profile</h1>
+    <main>
+      <div>
+        <h1>Edit Profile</h1>
 
         <Image
           src={user.avatar || '/next.svg'}
           alt="User Avatar"
           width={120}
           height={120}
-          className={css.avatar}
         />
 
-        <form onSubmit={handleSaveProfile} className={css.profileInfo}>
-          <div className={css.usernameWrapper}>
+        <form onSubmit={handleSaveProfile}>
+          <div>
             <label htmlFor="username">Username:</label>
             <input
               id="username"
               type="text"
               value={newUsername}
               onChange={handleUsernameChange}
-              className={css.input}
             />
           </div>
 
           <p>Email: {user.email}</p>
 
-          <div className={css.actions}>
-            <button type="submit" className={css.saveButton}>
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={handleCancel}
-              className={css.cancelButton}
-            >
-              Cancel
-            </button>
+          <div>
+            <button type="submit">Save</button>
+            <button type="button" onClick={handleCancel}>Cancel</button>
           </div>
         </form>
       </div>

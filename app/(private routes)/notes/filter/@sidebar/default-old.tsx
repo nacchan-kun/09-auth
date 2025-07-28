@@ -6,9 +6,18 @@ import type { Tag } from '@/types/note';
 const NotesSidebar = async () => {
   let tags: Tag[] = [];
   
+  // Helper function to check if a value is a valid Tag
+  const isValidTag = (tag: string | undefined): tag is Tag => {
+    const validTags: Tag[] = ['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'];
+    return tag !== undefined && validTags.includes(tag as Tag);
+  };
+
   try {
     const response = await fetchNotes({});
-    const rawTags: Tag[] = response?.notes?.map(note => note.tag) ?? [];
+    const rawTags: Tag[] = response?.notes
+      ?.filter(note => note.tag) // Filter out notes without tags
+      .map(note => note.tag as Tag) ?? []; // Cast to Tag since we filtered out undefined
+  
     const uniqueTags = Array.from(new Set<Tag>(rawTags));
     tags = [...uniqueTags];
   } catch (error) {

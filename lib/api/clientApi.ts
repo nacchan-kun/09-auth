@@ -80,8 +80,3 @@ export const updateMe = async (updata: UpdateUserRequest): Promise<User> => {
   const { data } = await api.patch('/users/me', updata);
   return data;
 };
-
-export const updateProfile = async (userData: { username: string }): Promise<User> => {
-  const response = await api.patch<User>('/users/me', userData);
-  return response.data;
-};

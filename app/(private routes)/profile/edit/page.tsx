@@ -4,8 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuthStore } from '@/lib/store/authStore';
-import { updateProfile } from '@/lib/api/clientApi';
-import { User } from '@/types/user';
+import { updateMe } from '@/lib/api/clientApi'; // Use updateMe instead of updateProfile
 import css from './page.module.css';
 
 export default function EditProfilePage() {
@@ -29,7 +28,8 @@ export default function EditProfilePage() {
     setError('');
 
     try {
-      const updatedUser = await updateProfile({ username });
+      // Use updateMe function that already exists in clientApi
+      const updatedUser = await updateMe({ username });
 
       // Update the global authentication store
       setUser(updatedUser);

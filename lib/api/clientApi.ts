@@ -39,14 +39,8 @@ export const getSession = async (): Promise<User | null> => {
   }
 };
 
-export const checkSession = async (): Promise<User | null> => {
-  try {
-    const response = await api.get('/auth/session');
-    return response.data;
-  } catch {
-    return null;
-  }
-};
+// If you have getSession, also export it as checkSession:
+export { getSession as checkSession };
 
 export const getMe = async (): Promise<User> => {
   const response = await api.get('/users/me');

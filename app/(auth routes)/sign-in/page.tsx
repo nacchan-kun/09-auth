@@ -19,7 +19,7 @@ export default function Login() {
       setError('');
       setIsLoading(true);
       const formValues = Object.fromEntries(formData) as LoginRequest;
-      const res = await login(formValues.email, formValues.password);
+      const res = await login(formValues);
       if (res) {
         // Записуємо користувача у глобальний стан
         setUser(res);

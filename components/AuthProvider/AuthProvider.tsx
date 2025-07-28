@@ -10,9 +10,7 @@ type Props = {
 
 export default function AuthProvider({ children }: Props) {
   const setUser = useAuthStore(state => state.setUser);
-  const clearIsAuthenticated = useAuthStore(
-    state => state.clearIsAuthenticated
-  );
+  const clearUser = useAuthStore(state => state.clearUser);
 
   useEffect(() => {
     async function fetchUser() {
@@ -22,13 +20,13 @@ export default function AuthProvider({ children }: Props) {
         setUser(user);
       } catch {
         // Don't log errors, just clear auth state
-        clearIsAuthenticated();
+        clearUser();
       }
     }
     
     // Only run auth check, don't block rendering
     fetchUser();
-  }, [setUser, clearIsAuthenticated]);
+  }, [setUser, clearUser]);
 
   // Always render children, don't block on auth loading
   return <>{children}</>;

@@ -16,13 +16,11 @@ export default function SignUp() {
 
   const setUser = useAuthStore(state => state.setUser);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = async (formData: FormData) => {
     setError('');
     setIsLoading(true);
     
     try {
-      const formData = new FormData(e.currentTarget);
       const formValues = Object.fromEntries(formData) as RegisterRequest;
       const user = await register(formValues.email, formValues.password);
       
@@ -37,7 +35,6 @@ export default function SignUp() {
     } catch (error: unknown) {
       console.error('error', error);
       
-      // Type guard for axios error
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as { response: { status: number; data?: { message?: string } } };
         if (axiosError.response?.status === 409) {

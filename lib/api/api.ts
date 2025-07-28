@@ -1,11 +1,11 @@
 import axios from 'axios';
 
-console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL); // Debug log
+console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
 
-const baseURL = (process.env.NEXT_PUBLIC_API_URL || 'https://notehub-api.goit.study') + '/api';
+const baseURL = process.env.NEXT_PUBLIC_API_URL || 'https://notehub-api.goit.study';
 
-console.log('Final baseURL:', baseURL); // Debug log
+console.log('Final baseURL:', baseURL);
 
 export const api = axios.create({
-  baseURL,
+  baseURL, // Remove the '/api' suffix
 });

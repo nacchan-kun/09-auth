@@ -1,6 +1,5 @@
 'use client';
 
-//import type { Note } from '@/types/note';
 import { useState } from 'react';
 import type { FetchNotesHTTPResponse } from '@/lib/api/serverApi';
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
@@ -8,8 +7,6 @@ import { fetchNotes } from '@/lib/api/clientApi';
 import SearchBox from '@/components/SearchBox/SearchBox';
 import Pagination from '@/components/Pagination/Pagination';
 import NoteList from '@/components/NoteList/NoteList';
-//import Modal from '@/components/Modal/Modal';
-//import NoteForm from '@/components/NoteForm/NoteForm';
 import { useDebounce } from 'use-debounce';
 import css from './Notes.client.module.css';
 import Loader from '@/components/Loader/Loader';

@@ -8,5 +8,4 @@ console.log('Final baseURL:', baseURL); // Debug log
 
 export const api = axios.create({
   baseURL,
-  withCredentials: true,
 });

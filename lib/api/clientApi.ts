@@ -53,14 +53,29 @@ export const deleteNote = async (id: string) => {
   return response.data;
 };
 
-export const login = async (logindata: AuthRequest) => {
-  const { data } = await api.post<User>('/auth/login', logindata);
-  return data;
+// Add token handling to login/register
+export const login = async (email: string, password: string) => {
+  const response = await api.post('/auth/login', { email, password });
+
+  // If API returns a token, store it
+  if (response.data.token) {
+    localStorage.setItem('authToken', response.data.token);
+    api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+  }
+
+  return response.data;
 };
 
-export const register = async (data: AuthRequest): Promise<User> => {
-  const res = await api.post<User>('/auth/register', data);
-  return res.data;
+export const register = async (email: string, password: string) => {
+  const response = await api.post('/auth/register', { email, password });
+
+  // If API returns a token, store it
+  if (response.data.token) {
+    localStorage.setItem('authToken', response.data.token);
+    api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
+  }
+
+  return response.data;
 };
 
 export const logout = async (): Promise<void> => {

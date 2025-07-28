@@ -1,38 +1,33 @@
 'use client';
 
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import css from './SignInPage.module.css';
-import { LoginRequest } from '@/types/authorisationTypes';
-import { login } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
-import { useState } from 'react';
+import { login } from '@/lib/api/clientApi';
+import type { LoginRequest } from '@/lib/api/clientApi';
+import css from './page.module.css';
 
-export default function Login() {
-  const router = useRouter();
-  const [error, setError] = useState('');
+export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
-  // Отримуємо метод із стора
-  const setUser = useAuthStore(state => state.setUser);
+  const [error, setError] = useState('');
+  const { setUser } = useAuthStore();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
     setIsLoading(true);
-
+    
     try {
       const formData = new FormData(e.currentTarget);
       const formValues = Object.fromEntries(formData) as LoginRequest;
-      const res = await login(formValues);
-
-      if (res) {
-        // Записуємо користувача у глобальний стан
-        setUser(res);
-        router.push('/profile');
-      }
+      const user = await login(formValues);
+      
+      setUser(user);
+      router.push('/profile');
     } catch (error: unknown) {
-      console.error('error', error);
-
-      // Type guard for axios error
+      console.error('Login error:', error);
+      
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as { response: { status: number; data?: { message?: string } } };
         if (axiosError.response?.status === 401) {
@@ -54,13 +49,13 @@ export default function Login() {
     <main className={css.mainContent}>
       <form onSubmit={handleSubmit} className={css.form}>
         <h1 className={css.formTitle}>Sign in</h1>
-
+        
         <div className={css.formGroup}>
           <label htmlFor="email">Email</label>
           <input
             id="email"
-            type="email"
             name="email"
+            type="email"
             className={css.input}
             required
           />
@@ -70,20 +65,18 @@ export default function Login() {
           <label htmlFor="password">Password</label>
           <input
             id="password"
-            type="password"
             name="password"
+            type="password"
             className={css.input}
             required
           />
         </div>
 
-        <div className={css.actions}>
-          <button type="submit" className={css.submitButton} disabled={isLoading}>
-            {isLoading ? 'Signing in...' : 'Log in'}
-          </button>
-        </div>
+        {error && <p className={css.error}>{error}</p>}
 
-        <p className={css.error}>{error}</p>
+        <button type="submit" className={css.submitButton} disabled={isLoading}>
+          {isLoading ? 'Signing in...' : 'Sign in'}
+        </button>
       </form>
     </main>
   );

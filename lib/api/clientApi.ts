@@ -1,80 +1,28 @@
-import { Note } from '@/types/note';
-import { User } from '@/types/user';
 import { api } from './api';
-import { FetchNotesParams, FetchNotesHTTPResponse } from './serverApi';
+import type { User } from '@/types/user';
+import type { Note } from '@/types/note';
 
-export type AuthRequest = {
+export interface LoginRequest {
   email: string;
   password: string;
-};
-
-export type UpdateUserRequest = {
-  username: string;
-};
-
-export const fetchNotes = async ({ search, page, tag }: FetchNotesParams) => {
-  const response = await api.get<FetchNotesHTTPResponse>('/notes', {
-    params: {
-      ...(search !== '' && { search }),
-      page,
-      perPage: 12,
-      ...(tag && { tag }),
-    },
-  });
-  return response.data;
-};
-
-export const getNoteById = async (id: string): Promise<Note> => {
-  const { data } = await api.get<Note>(`/notes/${id}`);
-  return data;
-};
-
-export type CreateNoteParams = {
-  title: string;
-  content: string;
-  tag?: string;
-};
-
-export async function createNote({
-  title,
-  content,
-  tag,
-}: CreateNoteParams): Promise<Note> {
-  const response = await api.post<Note>('/notes', {
-    title,
-    content,
-    tag,
-  });
-  return response.data;
 }
 
-export const deleteNote = async (id: string) => {
-  const response = await api.delete<Note>(`/notes/${id}`);
+export interface RegisterRequest {
+  email: string;
+  password: string;
+}
+
+export interface UpdateUserRequest {
+  username?: string;
+}
+
+export const login = async (credentials: LoginRequest): Promise<User> => {
+  const response = await api.post('/auth/login', credentials);
   return response.data;
 };
 
-// Add token handling to login/register
-export const login = async (formValues: { email: string; password: string }) => {
-  const response = await api.post('/auth/login', formValues);
-
-  // If API returns a token, store it
-  if (response.data.token) {
-    localStorage.setItem('authToken', response.data.token);
-    api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-  }
-
-  return response.data;
-};
-
-export const register = async (email: string, password: string) => {
-  const response = await api.post('/auth/register', { email, password });
-
-  // If API returns a token, store it
-  if (response.data.token) {
-    localStorage.setItem('authToken', response.data.token);
-    api.defaults.headers.common['Authorization'] = `Bearer ${response.data.token}`;
-  }
-
+export const register = async (credentials: RegisterRequest): Promise<User> => {
+  const response = await api.post('/auth/register', credentials);
   return response.data;
 };
 
@@ -82,16 +30,44 @@ export const logout = async (): Promise<void> => {
   await api.post('/auth/logout');
 };
 
-export const checkSession = async () => {
-  await api.get('/auth/session');
-};
-
 export const getMe = async (): Promise<User> => {
-  const { data } = await api.get('/users/me');
-  return data;
+  const response = await api.get('/users/me');
+  return response.data;
 };
 
-export const updateMe = async (updata: UpdateUserRequest): Promise<User> => {
-  const { data } = await api.patch('/users/me', updata);
-  return data;
+export const updateMe = async (userData: UpdateUserRequest): Promise<User> => {
+  const response = await api.patch('/users/me', userData);
+  return response.data;
+};
+
+export const fetchNotes = async (params: {
+  search?: string;
+  page?: number;
+  tag?: string;
+}): Promise<{ notes: Note[]; totalPages: number }> => {
+  const response = await api.get('/notes', {
+    params: {
+      ...params,
+      perPage: 12,
+    },
+  });
+  return response.data;
+};
+
+export const createNote = async (note: {
+  title: string;
+  content: string;
+  tag: string;
+}): Promise<Note> => {
+  const response = await api.post('/notes', note);
+  return response.data;
+};
+
+export const getNoteById = async (id: string): Promise<Note> => {
+  const response = await api.get(`/notes/${id}`);
+  return response.data;
+};
+
+export const deleteNote = async (id: string): Promise<void> => {
+  await api.delete(`/notes/${id}`);
 };

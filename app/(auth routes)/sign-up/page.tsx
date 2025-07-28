@@ -1,20 +1,17 @@
 'use client';
 
-import { register } from '@/lib/api/clientApi';
-import { RegisterRequest } from '@/types/authorisationTypes';
-import { User } from '@/types/user';
-import { useAuthStore } from '@/lib/store/authStore';
+import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useAuthStore } from '@/lib/store/authStore';
+import { register } from '@/lib/api/clientApi';
+import type { RegisterRequest } from '@/lib/api/clientApi';
+import css from './page.module.css';
 
-import css from './SignUpPage.module.css';
-
-export default function SignUp() {
-  const router = useRouter();
-  const [error, setError] = useState('');
+export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
-
-  const setUser = useAuthStore(state => state.setUser);
+  const [error, setError] = useState('');
+  const { setUser } = useAuthStore();
+  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,18 +21,12 @@ export default function SignUp() {
     try {
       const formData = new FormData(e.currentTarget);
       const formValues = Object.fromEntries(formData) as RegisterRequest;
-      const user = await register(formValues.email, formValues.password);
+      const user = await register(formValues);
       
-      if (user) {
-        const userWithAvatar: User = {
-          ...user,
-          avatar: user.avatar || '/next.svg'
-        };
-        setUser(userWithAvatar);
-        router.push('/profile');
-      }
+      setUser(user);
+      router.push('/profile');
     } catch (error: unknown) {
-      console.error('error', error);
+      console.error('Registration error:', error);
       
       if (error && typeof error === 'object' && 'response' in error) {
         const axiosError = error as { response: { status: number; data?: { message?: string } } };
@@ -62,32 +53,30 @@ export default function SignUp() {
         <div className={css.formGroup}>
           <label htmlFor="email">Email</label>
           <input
-            type="email"
-            name="email"
             id="email"
-            required
+            name="email"
+            type="email"
             className={css.input}
+            required
           />
         </div>
 
         <div className={css.formGroup}>
           <label htmlFor="password">Password</label>
           <input
-            type="password"
-            name="password"
             id="password"
-            required
+            name="password"
+            type="password"
             className={css.input}
+            required
           />
         </div>
 
-        <div className={css.actions}>
-          <button type="submit" className={css.submitButton} disabled={isLoading}>
-            {isLoading ? 'Registering...' : 'Register'}
-          </button>
-        </div>
-
         {error && <p className={css.error}>{error}</p>}
+
+        <button type="submit" className={css.submitButton} disabled={isLoading}>
+          {isLoading ? 'Signing up...' : 'Sign up'}
+        </button>
       </form>
     </main>
   );

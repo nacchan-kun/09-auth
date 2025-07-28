@@ -1,39 +1,91 @@
 'use client';
 
+import React from 'react';
+import Link from 'next/link';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { deleteNote } from '@/lib/api/clientApi';
 import { Note } from '@/types/note';
 import css from './NoteList.module.css';
-import NoteItem from '../NoteItem/NoteItem';
-import { deleteNote } from '@/lib/api/clientApi';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-type Props = {
-  items: Note[];
-};
+interface NoteListProps {
+  notes: Note[];
+}
 
-export default function NoteList({ items }: Props) {
+export default function NoteList({ notes }: NoteListProps) {
   const queryClient = useQueryClient();
 
-  const { mutate: removeItem, isPending } = useMutation({
+  const deleteMutation = useMutation({
     mutationFn: deleteNote,
     onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: ['allNotes'],
-      });
+      // Invalidate and refetch notes after successful deletion
+      queryClient.invalidateQueries({ queryKey: ['notes'] });
+    },
+    onError: (error) => {
+      console.error('Failed to delete note:', error);
     },
   });
 
+  const handleDelete = (noteId: string) => {
+    if (window.confirm('Are you sure you want to delete this note?')) {
+      deleteMutation.mutate(noteId);
+    }
+  };
+
+  if (!notes || notes.length === 0) {
+    return (
+      <div className={css.emptyState}>
+        <p>No notes found. Create your first note!</p>
+      </div>
+    );
+  }
+
   return (
-    <ul className={css.list}>
-      {items
-        // .filter(note => note.id)
-        .map(el => (
-          <NoteItem
-            key={el.id}
-            item={el}
-            removeItemAction={removeItem}
-            isPending={isPending}
-          />
-        ))}
-    </ul>
+    <div className={css.noteList}>
+      {notes.map((note) => (
+        <div key={note.id} className={css.noteCard}>
+          {/* Note Title */}
+          <h3 className={css.noteTitle}>
+            <Link href={`/notes/${note.id}`} className={css.noteLink}>
+              {note.title}
+            </Link>
+          </h3>
+
+          {/* Note Content */}
+          <p className={css.noteContent}>
+            {note.content.length > 150
+              ? `${note.content.substring(0, 150)}...`
+              : note.content}
+          </p>
+
+          {/* Note Tag */}
+          {note.tag && (
+            <div className={css.tagContainer}>
+              <span className={css.tag}>#{note.tag}</span>
+            </div>
+          )}
+
+          {/* Note Actions */}
+          <div className={css.noteActions}>
+            <Link href={`/notes/${note.id}`} className={css.viewButton}>
+              View
+            </Link>
+            <button
+              onClick={() => handleDelete(note.id)}
+              className={css.deleteButton}
+              disabled={deleteMutation.isPending}
+            >
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+            </button>
+          </div>
+
+          {/* Note Metadata */}
+          <div className={css.noteMeta}>
+            <span className={css.noteDate}>
+              {new Date(note.createdAt).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+      ))}
+    </div>
   );
 }

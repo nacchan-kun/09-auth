@@ -16,11 +16,13 @@ export default function SignUp() {
 
   const setUser = useAuthStore(state => state.setUser);
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     setError('');
     setIsLoading(true);
     
     try {
+      const formData = new FormData(e.currentTarget);
       const formValues = Object.fromEntries(formData) as RegisterRequest;
       const user = await register(formValues.email, formValues.password);
       

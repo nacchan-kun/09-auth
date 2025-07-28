@@ -15,8 +15,8 @@ const NotesSidebar = async () => {
   try {
     const response = await fetchNotes({});
     const rawTags: Tag[] = response?.notes
-      ?.filter(note => note.tag) // Filter out notes without tags
-      .map(note => note.tag as Tag) ?? []; // Cast to Tag since we filtered out undefined
+      ?.map(note => note.tag)
+      .filter(isValidTag) ?? []; // Use the isValidTag function here
   
     const uniqueTags = Array.from(new Set<Tag>(rawTags));
     tags = [...uniqueTags];

@@ -1,102 +1,62 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
-import { parse } from 'cookie';
-
-const privateRoutes = ['/profile', '/notes'];
-const authRoutes = ['/sign-in', '/sign-up'];
-
-async function checkSessionInMiddleware(request: NextRequest, cookieStore: any) {
-  try {
-    const baseURL = process.env.NEXT_PUBLIC_API_URL;
-    const response = await fetch(`${baseURL}/auth/session`, {
-      method: 'GET',
-      headers: {
-        'Cookie': cookieStore.toString(),
-        'Content-Type': 'application/json',
-      },
-    });
-    return response;
-  } catch (error) {
-    console.error('Session check failed in middleware:', error);
-    return null;
-  }
-}
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { checkSession } from './lib/api/serverApi';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const cookieStore = await cookies();
-  const accessToken = cookieStore.get('accessToken')?.value;
-  const refreshToken = cookieStore.get('refreshToken')?.value;
-
-  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route));
-  const isPrivateRoute = privateRoutes.some(route =>
-    pathname.startsWith(route)
-  );
-
-  if (!accessToken) {
-    if (refreshToken) {
-      // Check session with external API call
-      const response = await checkSessionInMiddleware(request, cookieStore);
-      const setCookie = response?.headers.get('set-cookie');
-
-      if (setCookie && response?.ok) {
-        const cookieArray = Array.isArray(setCookie) ? setCookie : [setCookie];
-        for (const cookieStr of cookieArray) {
-          const parsed = parse(cookieStr);
-          const options = {
-            expires: parsed.Expires ? new Date(parsed.Expires) : undefined,
-            path: parsed.Path,
-            maxAge: Number(parsed['Max-Age']),
-          };
-          if (parsed.accessToken)
-            cookieStore.set('accessToken', parsed.accessToken, options);
-          if (parsed.refreshToken)
-            cookieStore.set('refreshToken', parsed.refreshToken, options);
-        }
-        
-        // If session is still active
-        if (isAuthRoute) {
-          return NextResponse.redirect(new URL('/', request.url), {
-            headers: {
-              Cookie: cookieStore.toString(),
-            },
-          });
-        }
-        if (isPrivateRoute) {
-          return NextResponse.next({
-            headers: {
-              Cookie: cookieStore.toString(),
-            },
-          });
-        }
-      }
-    }
-    
-    // If no refreshToken or session is invalid
-    if (isAuthRoute) {
-      return NextResponse.next();
-    }
-
-    if (isPrivateRoute) {
-      return NextResponse.redirect(new URL('/sign-in', request.url));
-    }
-  }
-
-  // If accessToken exists
-  if (isAuthRoute) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
-  if (isPrivateRoute) {
+  
+  // Define route types
+  const isAuthRoute = pathname.startsWith('/sign-in') || pathname.startsWith('/sign-up');
+  const isPrivateRoute = pathname.startsWith('/profile') || pathname.startsWith('/notes');
+  
+  // If it's neither auth nor private route, continue normally
+  if (!isAuthRoute && !isPrivateRoute) {
     return NextResponse.next();
   }
+  
+  // Check session using the provided serverApi function
+  let sessionValid = false;
+  try {
+    const sessionResponse = await checkSession();
+    sessionValid = sessionResponse.success;
+  } catch (error) {
+    console.error('Session check failed:', error);
+    sessionValid = false;
+  }
+  
+  // Handle auth routes (sign-in, sign-up)
+  if (isAuthRoute) {
+    if (sessionValid) {
+      // If user is authenticated and trying to access auth routes, redirect to profile
+      return NextResponse.redirect(new URL('/profile', request.url));
+    }
+    // If not authenticated, allow access to auth routes
+    return NextResponse.next();
+  }
+  
+  // Handle private routes (profile, notes)
+  if (isPrivateRoute) {
+    if (!sessionValid) {
+      // If user is not authenticated and trying to access private routes, redirect to sign-in
+      return NextResponse.redirect(new URL('/sign-in', request.url));
+    }
+    // If authenticated, allow access to private routes
+    return NextResponse.next();
+  }
+  
+  // Fallback - should not reach here due to the early return above
+  return NextResponse.next();
 }
 
 export const config = {
   matcher: [
-    '/sign-in',
-    '/sign-up',
-    '/profile/:path*',
-    '/notes/:path*',
-    '/notes/filter/:path*',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
   ],
 };

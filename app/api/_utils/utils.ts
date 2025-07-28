@@ -1,3 +1,3 @@
-export function logErrorResponse(error: any) {
+export function logErrorResponse(error: unknown) {
   console.error('API Error:', error);
 }

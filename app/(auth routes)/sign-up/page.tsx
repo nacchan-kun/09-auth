@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import { register } from '@/lib/api/clientApi';
 import type { RegisterRequest } from '@/lib/api/clientApi';
-import css from './page.module.css';
 
 export default function SignUpPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -46,35 +45,33 @@ export default function SignUpPage() {
   };
 
   return (
-    <main className={css.mainContent}>
-      <form onSubmit={handleSubmit} className={css.form}>
-        <h1 className={css.formTitle}>Sign up</h1>
+    <main>
+      <form onSubmit={handleSubmit}>
+        <h1>Sign up</h1>
         
-        <div className={css.formGroup}>
+        <div>
           <label htmlFor="email">Email</label>
           <input
             id="email"
             name="email"
             type="email"
-            className={css.input}
             required
           />
         </div>
 
-        <div className={css.formGroup}>
+        <div>
           <label htmlFor="password">Password</label>
           <input
             id="password"
             name="password"
             type="password"
-            className={css.input}
             required
           />
         </div>
 
-        {error && <p className={css.error}>{error}</p>}
+        {error && <p style={{ color: 'red' }}>{error}</p>}
 
-        <button type="submit" className={css.submitButton} disabled={isLoading}>
+        <button type="submit" disabled={isLoading}>
           {isLoading ? 'Signing up...' : 'Sign up'}
         </button>
       </form>

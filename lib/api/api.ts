@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = process.env.NEXT_PUBLIC_API_URL + '/api';
+const baseURL = 'https://09-auth-gamma-lyart.vercel.app/api'; // Hard-coded for testing
 
 export const api = axios.create({
   baseURL,

@@ -57,7 +57,7 @@ export default function SignUp() {
 
   return (
     <main className={css.mainContent}>
-      <form action={handleSubmit} className={css.form}>
+      <form onSubmit={handleSubmit} className={css.form}>
         <h1 className={css.formTitle}>Sign up</h1>
         
         <div className={css.formGroup}>

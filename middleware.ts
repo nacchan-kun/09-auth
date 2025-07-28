@@ -18,7 +18,7 @@ export async function middleware(request: NextRequest) {
   let sessionValid = false;
   try {
     const sessionResponse = await checkSession();
-    sessionValid = sessionResponse.success;
+    sessionValid = sessionResponse.data.success; // Access .data from full response
   } catch (error) {
     console.error('Session check failed:', error);
     sessionValid = false;

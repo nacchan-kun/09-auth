@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { checkSession, getMe, updateMe } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
 
-import css from './EditProfileForm.module.css';
+import css from './page.module.css';
 
 export default function EditProfilePage() {
   const router = useRouter();

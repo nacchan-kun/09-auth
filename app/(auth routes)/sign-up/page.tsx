@@ -34,14 +34,19 @@ export default function SignUp() {
         setUser(userWithAvatar);
         router.push('/profile');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('error', error);
       
-      // Handle specific error cases
-      if (error.response?.status === 409) {
-        setError('An account with this email already exists. Please use a different email or try signing in.');
-      } else if (error.response?.data?.message) {
-        setError(error.response.data.message);
+      // Type guard for axios error
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response: { status: number; data?: { message?: string } } };
+        if (axiosError.response?.status === 409) {
+          setError('An account with this email already exists. Please use a different email or try signing in.');
+        } else if (axiosError.response?.data?.message) {
+          setError(axiosError.response.data.message);
+        } else {
+          setError('Registration failed. Please try again.');
+        }
       } else {
         setError('Registration failed. Please try again.');
       }

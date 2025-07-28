@@ -50,14 +50,19 @@ export default function Login() {
         setUser(res);
         router.push('/profile');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('error', error);
 
-      // Handle specific error cases
-      if (error.response?.status === 401) {
-        setError('Invalid email or password. Please check your credentials and try again.');
-      } else if (error.response?.data?.message) {
-        setError(error.response.data.message);
+      // Type guard for axios error
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response: { status: number; data?: { message?: string } } };
+        if (axiosError.response?.status === 401) {
+          setError('Invalid email or password. Please check your credentials and try again.');
+        } else if (axiosError.response?.data?.message) {
+          setError(axiosError.response.data.message);
+        } else {
+          setError('Login failed. Please try again.');
+        }
       } else {
         setError('Login failed. Please try again.');
       }
@@ -68,7 +73,7 @@ export default function Login() {
 
   return (
     <main className={css.mainContent}>
-      <form action={handleLogin} className={css.form}>
+      <form onSubmit={handleSubmit} className={css.form}>
         <h1 className={css.formTitle}>Sign in</h1>
 
         <div className={css.formGroup}>

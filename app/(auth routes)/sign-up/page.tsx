@@ -16,26 +16,35 @@ export default function SignUp() {
 
   const setUser = useAuthStore(state => state.setUser);
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+    
     try {
-      setError('');
-      setIsLoading(true);
+      const formData = new FormData(e.currentTarget);
       const formValues = Object.fromEntries(formData) as RegisterRequest;
       const user = await register(formValues.email, formValues.password);
+      
       if (user) {
-        // Create a proper User object with avatar field
         const userWithAvatar: User = {
           ...user,
-          avatar: user.avatar || '', // Ensure avatar is always a string
+          avatar: user.avatar || '/next.svg'
         };
         setUser(userWithAvatar);
-        router.replace('/profile');
-      } else {
-        setError('Invalid email or password');
+        router.push('/profile');
       }
-    } catch (error) {
-      console.log('error', error);
-      setError('Oops... Something went wrong, try later');
+    } catch (error: any) {
+      console.error('error', error);
+      
+      // Handle specific error cases
+      if (error.response?.status === 409) {
+        setError('An account with this email already exists. Please use a different email or try signing in.');
+      } else if (error.response?.data?.message) {
+        setError(error.response.data.message);
+      } else {
+        setError('Registration failed. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }

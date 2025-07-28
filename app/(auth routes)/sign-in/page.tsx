@@ -14,27 +14,6 @@ export default function Login() {
   // Отримуємо метод із стора
   const setUser = useAuthStore(state => state.setUser);
 
-  const handleLogin = async (formData: FormData) => {
-    try {
-      setError('');
-      setIsLoading(true);
-      const formValues = Object.fromEntries(formData) as LoginRequest;
-      const res = await login(formValues);
-      if (res) {
-        // Записуємо користувача у глобальний стан
-        setUser(res);
-        router.push('/profile');
-      } else {
-        setError('Invalid email or password');
-      }
-    } catch (error) {
-      console.log('error', error);
-      setError('Invalid email or password');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');

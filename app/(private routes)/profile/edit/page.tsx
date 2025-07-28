@@ -1,116 +1,107 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+
+import { checkSession, getMe, updateMe } from '@/lib/api/clientApi';
 import { useAuthStore } from '@/lib/store/authStore';
-import { updateMe } from '@/lib/api/clientApi'; // Use updateMe instead of updateProfile
-import css from './page.module.css';
+
+import css from './EditProfileForm.module.css';
 
 export default function EditProfilePage() {
-  const { user, setUser } = useAuthStore();
   const router = useRouter();
-  const [username, setUsername] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const user = useAuthStore(state => state.user);
+  const setUser = useAuthStore(state => state.setUser);
+  const clearIsAuthenticated = useAuthStore(
+    state => state.clearIsAuthenticated
+  );
+
+  const [newUsername, setNewUsername] = useState('');
 
   useEffect(() => {
     if (user) {
-      setUsername(user.username || '');
+      setNewUsername(user.username || '');
+      return;
     }
-  }, [user]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+    const fetchUser = async () => {
+      try {
+        await checkSession();
+        const fetchedUser = await getMe();
+        if (fetchedUser) {
+          setUser(fetchedUser);
+          setNewUsername(fetchedUser.username || '');
+        }
+      } catch {
+        clearIsAuthenticated();
+      }
+    };
+
+    fetchUser();
+  }, [user, setUser, clearIsAuthenticated]);
+
+  const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setNewUsername(e.target.value);
+  };
+
+  const handleSaveProfile = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!user) return;
-
-    setIsLoading(true);
-    setError('');
 
     try {
-      // Use updateMe function that already exists in clientApi
-      const updatedUser = await updateMe({ username });
-
-      // Update the global authentication store
-      setUser(updatedUser);
-
+      await updateMe({ username: newUsername });
+      if (user) {
+        setUser({ ...user, username: newUsername });
+      }
       router.push('/profile');
     } catch (error) {
-      console.error('Failed to update profile:', error);
-      setError('Failed to update profile. Please try again.');
-    } finally {
-      setIsLoading(false);
+      console.error(error);
     }
   };
 
   const handleCancel = () => {
-    router.push('/profile');
+    router.back();
   };
 
-  if (!user) {
-    return <div>Loading...</div>;
-  }
+  if (!user) return null;
 
   return (
     <main className={css.mainContent}>
       <div className={css.profileCard}>
         <h1 className={css.formTitle}>Edit Profile</h1>
 
-        {/* Display user avatar using Next.js Image component */}
-        <div className={css.avatarWrapper}>
-          <Image
-            src={user.avatar || '/next.svg'}
-            alt="User Avatar"
-            width={120}
-            height={120}
-            className={css.avatar}
-          />
-        </div>
+        <Image
+          src={user.avatar}
+          alt="User Avatar"
+          width={120}
+          height={120}
+          className={css.avatar}
+        />
 
-        <form className={css.form} onSubmit={handleSubmit}>
-          <div className={css.formGroup}>
-            <label htmlFor="username">Username</label>
+        <form onSubmit={handleSaveProfile} className={css.profileInfo}>
+          <div className={css.usernameWrapper}>
+            <label htmlFor="username">Username:</label>
             <input
               id="username"
               type="text"
-              name="username"
+              value={newUsername}
+              onChange={handleUsernameChange}
               className={css.input}
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
             />
           </div>
 
-          <div className={css.formGroup}>
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              type="email"
-              name="email"
-              className={css.input}
-              value={user.email}
-              readOnly
-              disabled
-            />
-          </div>
-
-          {error && <p className={css.error}>{error}</p>}
+          <p>Email: {user.email}</p>
 
           <div className={css.actions}>
-            <button
-              type="button"
-              className={css.cancelButton}
-              onClick={handleCancel}
-              disabled={isLoading}
-            >
-              Cancel
+            <button type="submit" className={css.saveButton}>
+              Save
             </button>
             <button
-              type="submit"
-              className={css.submitButton}
-              disabled={isLoading}
+              type="button"
+              onClick={handleCancel}
+              className={css.cancelButton}
             >
-              {isLoading ? 'Updating...' : 'Update Profile'}
+              Cancel
             </button>
           </div>
         </form>

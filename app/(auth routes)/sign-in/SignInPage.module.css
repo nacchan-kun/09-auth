@@ -60,11 +60,6 @@
   background-color: #0b5ed7;
 }
 
-.submitButton:disabled {
-  background-color: #b1c7ae;
-  cursor: not-allowed;
-}
-
 .error {
   color: #dc3545;
   font-size: 12px;

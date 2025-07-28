@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/store/authStore';
 import { login } from '@/lib/api/clientApi';
 import type { LoginRequest } from '@/lib/api/clientApi';
+import css from './page.module.css';
 
 export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -45,35 +46,27 @@ export default function SignInPage() {
   };
 
   return (
-    <main>
-      <form onSubmit={handleSubmit}>
-        <h1>Sign in</h1>
-        
-        <div>
+    <main className={css.mainContent}>
+      <form className={css.form} onSubmit={handleSubmit}>
+        <h1 className={css.formTitle}>Sign in</h1>
+
+        <div className={css.formGroup}>
           <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            required
-          />
+          <input id="email" type="email" name="email" className={css.input} required />
         </div>
 
-        <div>
+        <div className={css.formGroup}>
           <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            required
-          />
+          <input id="password" type="password" name="password" className={css.input} required />
         </div>
 
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+        <div className={css.actions}>
+          <button type="submit" className={css.submitButton} disabled={isLoading}>
+            {isLoading ? 'Signing in...' : 'Log in'}
+          </button>
+        </div>
 
-        <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Signing in...' : 'Sign in'}
-        </button>
+        {error && <p className={css.error}>{error}</p>}
       </form>
     </main>
   );

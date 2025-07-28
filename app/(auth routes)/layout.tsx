@@ -10,17 +10,15 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   const [loading, setLoading] = useState(true);
-  const clearIsAuthenticated = useAuthStore(
-    state => state.clearIsAuthenticated
-  );
+  const clearUser = useAuthStore(state => state.clearUser);
 
   const router = useRouter();
 
   useEffect(() => {
-    clearIsAuthenticated();
+    clearUser();
     router.refresh();
     setLoading(false);
-  }, [clearIsAuthenticated, router]);
+  }, [clearUser, router]);
 
   return <>{loading ? <div>Loading...</div> : children}</>;
 }

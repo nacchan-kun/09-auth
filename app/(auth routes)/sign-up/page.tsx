@@ -20,7 +20,7 @@ export default function SignUpPage() {
     
     try {
       const formData = new FormData(e.currentTarget);
-      const formValues = Object.fromEntries(formData) as RegisterRequest;
+      const formValues = Object.fromEntries(formData) as unknown as RegisterRequest;
       const user = await register(formValues);
       
       setUser(user);

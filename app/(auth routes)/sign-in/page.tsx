@@ -20,7 +20,7 @@ export default function SignInPage() {
     
     try {
       const formData = new FormData(e.currentTarget);
-      const formValues = Object.fromEntries(formData) as LoginRequest;
+      const formValues = Object.fromEntries(formData) as unknown as LoginRequest;
       const user = await login(formValues);
       
       setUser(user);

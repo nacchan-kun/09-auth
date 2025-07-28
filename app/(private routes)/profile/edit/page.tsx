@@ -13,8 +13,8 @@ export default function EditProfilePage() {
   const router = useRouter();
   const user = useAuthStore(state => state.user);
   const setUser = useAuthStore(state => state.setUser);
-  const clearIsAuthenticated = useAuthStore(
-    state => state.clearIsAuthenticated
+  const clearUser = useAuthStore(
+    state => state.clearUser
   );
 
   const [newUsername, setNewUsername] = useState('');
@@ -34,12 +34,12 @@ export default function EditProfilePage() {
           setNewUsername(fetchedUser.username || '');
         }
       } catch {
-        clearIsAuthenticated();
+        clearUser();
       }
     };
 
     fetchUser();
-  }, [user, setUser, clearIsAuthenticated]);
+  }, [user, setUser, clearUser]);
 
   const handleUsernameChange = (e: ChangeEvent<HTMLInputElement>) => {
     setNewUsername(e.target.value);

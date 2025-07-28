@@ -39,6 +39,15 @@ export const getSession = async (): Promise<User | null> => {
   }
 };
 
+export const checkSession = async (): Promise<User | null> => {
+  try {
+    const response = await api.get('/auth/session');
+    return response.data;
+  } catch {
+    return null;
+  }
+};
+
 export const getMe = async (): Promise<User> => {
   const response = await api.get('/users/me');
   return response.data;

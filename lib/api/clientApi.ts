@@ -34,7 +34,7 @@ export const getSession = async (): Promise<User | null> => {
   try {
     const response = await api.get('/auth/session');
     return response.data;
-  } catch (error) {
+  } catch {
     return null;
   }
 };

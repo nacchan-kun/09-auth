@@ -8,18 +8,18 @@ import { logout } from '@/lib/api/clientApi';
 import css from './AuthNavigation.module.css';
 
 export default function AuthNavigation() {
-  const { user, isAuthenticated, clearIsAuthenticated } = useAuthStore();
+  const { user, isAuthenticated, clearUser } = useAuthStore();
   const router = useRouter();
 
   const handleLogout = async () => {
     try {
       await logout();
-      clearIsAuthenticated();
+      clearUser();
       router.push('/sign-in'); // Redirect to sign-in page instead of '/'
     } catch (error) {
       console.error('Logout failed:', error);
       // Even if logout API fails, clear local state and redirect
-      clearIsAuthenticated();
+      clearUser();
       router.push('/sign-in');
     }
   };

@@ -3,7 +3,7 @@
 // Force dynamic rendering for auth-dependent pages
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
+import { useEffect, useState, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
@@ -46,13 +46,13 @@ export default function EditProfilePage() {
     setNewUsername(e.target.value);
   };
 
-  const handleSaveProfile = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSaveProfile = async (formData: FormData) => {
+    const username = formData.get('username') as string;
 
     try {
-      await updateMe({ username: newUsername });
+      await updateMe({ username });
       if (user) {
-        setUser({ ...user, username: newUsername });
+        setUser({ ...user, username });
       }
       router.push('/profile');
     } catch (error) {
@@ -78,11 +78,12 @@ export default function EditProfilePage() {
           height={120}
         />
 
-        <form onSubmit={handleSaveProfile}>
+        <form action={handleSaveProfile}>
           <div>
             <label htmlFor="username">Username:</label>
             <input
               id="username"
+              name="username"
               type="text"
               value={newUsername}
               onChange={handleUsernameChange}

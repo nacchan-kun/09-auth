@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering for auth-dependent pages
+export const dynamic = 'force-dynamic';
+
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';

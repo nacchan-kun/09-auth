@@ -5,6 +5,9 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
 
+// Force dynamic rendering since we use cookies
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'NoteHub - Profile',
   description:
